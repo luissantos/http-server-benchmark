@@ -31,4 +31,4 @@
   ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
   ;; and https://http-kit.github.io/migration.html#reload
-  (reset! server (run-server handler {:port 8080  :thread (* n-cpu 2) })))
+  (reset! server (run-server handler {:port 8080  :thread (* n-cpu 1) })))
