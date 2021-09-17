@@ -1,0 +1,23 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        http-kit/http-kit {:mvn/version "2.5.3"}
+        metosin/reitit {:mvn/version "0.5.15"}
+        ring/ring-defaults {:mvn/version "0.3.3"}
+        metosin/jsonista {:mvn/version "0.3.4"}}
+ :aliases
+ {:run-m {:main-opts ["-m" "luissantos.http-server"]}
+  :run-x {:ns-default luissantos.http-server
+          :exec-fn greet
+          :exec-args {:name "Clojure"}}
+  :test {:extra-paths ["test"]
+         :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}
+                      io.github.cognitect-labs/test-runner
+                      {:git/url "https://github.com/cognitect-labs/test-runner"
+                       :sha "62ef1de18e076903374306060ac0e8a752e57c86"}}
+         :exec-fn cognitect.test-runner.api/test}
+  :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.278"}}
+            :exec-fn hf.depstar/uberjar
+            :exec-args {:aot true
+                        :jar "http-server.jar"
+                        :main-class "luissantos.http-server"
+                        :sync-pom true}}}}
