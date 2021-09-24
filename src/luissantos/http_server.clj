@@ -3,20 +3,40 @@
   (:require
    [reitit.ring :as ring]
    [jsonista.core :as json]
-   [ring.util.response :as response])
+   [ring.util.response :as response]
+   [luissantos.game :as game]
+   )
   (:gen-class))
 
 (set! *warn-on-reflection* true)
 (def n-cpu (.availableProcessors (Runtime/getRuntime)))
 
+
+(defn handle-game
+  ""
+  [game-fn]
+  (fn [request]
+               (->
+                (json/read-value (:body request) json/keyword-keys-object-mapper)
+                ((resolve game-fn))
+                (json/write-value-as-string)
+                (response/response)
+                (response/header "content-type" "application/json"))))
+
 (def handler
   (ring/ring-handler
    (ring/router
-    [["/api/json"
+    [
+     ["/end" {:post (handle-game 'luissantos.game/end)}]
+     ["/move" {:post (handle-game 'luissantos.game/move) }]
+     ["/start" {:post (handle-game 'luissantos.game/start)}]
+     ["/"
       {:get (fn [request]
-              (-> (json/write-value-as-string {"hello" "world"})
+              (-> (game/root request)
+                  (json/write-value-as-string)
                   (response/response)
-                  (response/header "content-type" "application/json")))}]])))
+                  (response/header "content-type" "application/json")))}]
+     ])))
 
 (defonce server (atom nil))
 
@@ -31,4 +51,10 @@
   ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
   ;; and https://http-kit.github.io/migration.html#reload
-  (reset! server (run-server handler {:port 8080  :thread (* n-cpu 1) })))
+  (reset! server (run-server #'handler {:port 8080  :thread (* n-cpu 1) })))
+
+(comment
+
+
+  (stop-server)
+  )
